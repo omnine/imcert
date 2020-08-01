@@ -4,6 +4,7 @@
 #include <iostream>
 
 #include <Windows.h>
+#include <wtsapi32.h>
 
 int main()
 {
@@ -11,16 +12,19 @@ int main()
 
 
     DWORD dwProcessId, dwSessionId;
+    dwProcessId = 1000;
 
     if (ProcessIdToSessionId(dwProcessId,  &dwSessionId) == 0) {
         return 50;
     }
 
+    HANDLE hToken = NULL;
+
     // get the active console session ID of the logged on user
+    //the calling application must be running within the context of the LocalSystem account and have the SE_TCB_NAME privilege.
     if (!WTSQueryUserToken(WTSGetActiveConsoleSessionId(), &hToken))
     {
-        ShowErrorText("WTSQueryUserToken failed.", GetLastError(), true);
-        return;
+        return 51;
     }
 
     HANDLE hDuplicated;
@@ -28,47 +32,29 @@ int main()
     // duplicate the token
     if (!DuplicateToken(hToken, SecurityImpersonation, &hDuplicated))
     {
-        ShowErrorText("DuplicateToken failed.", GetLastError(), true);
+        return 52;
     }
     else
     {
-        ShowErrorText("DuplicateToken succeeded.", 0, true);
+        //ShowErrorText("DuplicateToken succeeded.", 0, true);
     }
 
     // impersonate the logged on user
     if (!ImpersonateLoggedOnUser(hToken))
     {
-        ShowErrorText("ImpersonateLoggedOnUser failed.", GetLastError(), true);
-        return;
+       
+        return 53;
     }
 
-    // retrieve the DC name 
-    if (!GetPrimaryDC(DC))
-    {
-        ShowErrorText("GetPrimaryDC failed.", 0, true);
-    }
-    PROFILEINFO lpProfileInfo;
+    //open user cert store.
 
-    ZeroMemory(&lpProfileInfo, sizeof(PROFILEINFO));
-    lpProfileInfo.dwSize = sizeof(PROFILEINFO);
-    lpProfileInfo.lpUserName = CurrentUser;
 
-    // get type of profile. roaming, mandatory or temporary
-    int ret = GetTypeOfProfile();
-    if (ret == 2)
-    {
-        // if roaming profile get the path of it
-        if (!GetRoamingProfilePath(DC, CurrentUser, RoamingProfilePath))
-        {
-            ShowErrorText("Failed to retrieve roaming profile path.", GetLastError(), true);
-        }
-    }
     if (RevertToSelf())
     {
-        ShowErrorText("Impersonation ended successfully.", 0, true);
+        //ShowErrorText("Impersonation ended successfully.", 0, true);
     }
 
-
+    return 0;
 
 }
 
