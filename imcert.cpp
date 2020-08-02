@@ -2,13 +2,47 @@
 //
 
 #include <iostream>
+#include <vector>
 
 #include <Windows.h>
 #include <wtsapi32.h>
+#include <iphlpapi.h>
+
+using namespace std;
 
 int main()
 {
     std::cout << "Hello World!\n";
+
+
+    vector<unsigned char> buffer;
+    DWORD dwSize = sizeof(MIB_TCPTABLE_OWNER_PID);
+    DWORD dwRetValue = 0;
+
+    do {
+        buffer.resize(dwSize, 0);
+        dwRetValue = GetExtendedTcpTable(buffer.data(), &dwSize, TRUE, AF_INET, TCP_TABLE_OWNER_PID_ALL, 0);
+    } while (dwRetValue == ERROR_INSUFFICIENT_BUFFER);
+    if (dwRetValue == ERROR_SUCCESS)
+    {
+        PMIB_TCPTABLE_OWNER_PID ptTable = reinterpret_cast<PMIB_TCPTABLE_OWNER_PID>(buffer.data());
+        cout << "Number of Entries: " << ptTable->dwNumEntries << endl << endl;
+        for (DWORD i = 0; i < ptTable->dwNumEntries; i++) {
+            DWORD pid = ptTable->table[i].dwOwningPid;
+            cout << "PID: " << pid << endl;
+ //           cout << "Name: " << processName(ptTable->table[i].dwOwningPid) << endl;
+            cout << "State: " << ptTable->table[i].dwState << endl;
+            cout << "Local Port: "
+                << htons((unsigned short)ptTable->table[i].dwLocalPort)
+                << endl;
+
+            cout << "Remote Port: "
+                << htons((unsigned short)ptTable->table[i].dwRemotePort)
+                << endl;
+
+            cout << endl;
+        }
+    }
 
 
     DWORD dwProcessId, dwSessionId;
