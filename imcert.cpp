@@ -49,6 +49,7 @@ int main()
     dwProcessId = 1000;
 
     if (ProcessIdToSessionId(dwProcessId,  &dwSessionId) == 0) {
+        cout << "ProcessIdToSessionId failed with error = "  << GetLastError();
         return 50;
     }
 
@@ -58,6 +59,7 @@ int main()
     //the calling application must be running within the context of the LocalSystem account and have the SE_TCB_NAME privilege.
     if (!WTSQueryUserToken(WTSGetActiveConsoleSessionId(), &hToken))
     {
+        cout << "WTSQueryUserToken failed with error = " << GetLastError();
         return 51;
     }
 
@@ -66,6 +68,7 @@ int main()
     // duplicate the token
     if (!DuplicateToken(hToken, SecurityImpersonation, &hDuplicated))
     {
+        cout << "DuplicateToken failed with error = " << GetLastError();
         return 52;
     }
     else
@@ -76,7 +79,7 @@ int main()
     // impersonate the logged on user
     if (!ImpersonateLoggedOnUser(hToken))
     {
-       
+        cout << "ImpersonateLoggedOnUser failed with error = " << GetLastError();
         return 53;
     }
 
@@ -95,12 +98,38 @@ int main()
                                          // string
     ))
     {
-        printf("The system store was created successfully.\n");
+        printf("The system store was opened successfully.\n");
+        PCCERT_CONTEXT  pDesiredCert = NULL;
+        LPCSTR lpszCertSubject = (LPCSTR)"nanoart";
+
+        if (pDesiredCert = CertFindCertificateInStore(
+            hSysStore,
+            PKCS_7_ASN_ENCODING | X509_ASN_ENCODING,           // Use X509_ASN_ENCODING.
+            0,                          // No dwFlags needed. 
+            CERT_FIND_SUBJECT_STR,      // Find a certificate with a
+                                        // subject that matches the string
+                                        // in the next parameter.
+            lpszCertSubject,           // The Unicode string to be found
+                                        // in a certificate's subject.
+            NULL))                      // NULL for the first call to the
+                                        // function. In all subsequent
+                                        // calls, it is the last pointer
+                                        // returned by the function.
+        {
+            printf("The desired certificate was found. \n");
+        }
+        else
+        {
+            printf("Could not find the desired certificate.\n");
+        }
+
+
     }
     else
     {
         printf("An error occurred during creation "
             "of the system store!\n");
+        cout << "CertOpenStore failed with error = " << GetLastError();
         return 54;
     }
 
