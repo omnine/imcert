@@ -47,6 +47,28 @@ int main()
     }
 
     //open user cert store.
+    // Open a system store, in this case, the My store.
+
+    HCERTSTORE hSysStore = NULL;
+    if (hSysStore = CertOpenStore(
+        CERT_STORE_PROV_SYSTEM,          // The store provider type
+        0,                               // The encoding type is
+                                         // not needed
+        NULL,                            // Use the default HCRYPTPROV
+        CERT_SYSTEM_STORE_CURRENT_USER,  // Set the store location in a
+                                         // registry location
+        L"MY"                            // The store name as a Unicode 
+                                         // string
+    ))
+    {
+        printf("The system store was created successfully.\n");
+    }
+    else
+    {
+        printf("An error occurred during creation "
+            "of the system store!\n");
+        return 54;
+    }
 
 
     if (RevertToSelf())
