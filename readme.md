@@ -2,7 +2,7 @@ This is some test code for a windows service to impersonate a logged user to acc
 
 # Test
 
-Follow this (link)[https://stackoverflow.com/questions/77528/how-do-you-run-cmd-exe-under-the-local-system-account]
+Follow this [link](https://stackoverflow.com/questions/77528/how-do-you-run-cmd-exe-under-the-local-system-account).
 
 *psexec -i -s cmd.exe*
 
