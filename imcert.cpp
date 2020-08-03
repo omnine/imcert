@@ -12,9 +12,7 @@ using namespace std;
 
 int main()
 {
-    std::cout << "Hello World!\n";
-
-
+    //Find the process based on remote port, local port etc, we use the API GetExtendedTcpTable that the tool netstat used.
     vector<unsigned char> buffer;
     DWORD dwSize = sizeof(MIB_TCPTABLE_OWNER_PID);
     DWORD dwRetValue = 0;
@@ -27,6 +25,7 @@ int main()
     {
         PMIB_TCPTABLE_OWNER_PID ptTable = reinterpret_cast<PMIB_TCPTABLE_OWNER_PID>(buffer.data());
         cout << "Number of Entries: " << ptTable->dwNumEntries << endl << endl;
+        /*
         for (DWORD i = 0; i < ptTable->dwNumEntries; i++) {
             DWORD pid = ptTable->table[i].dwOwningPid;
             cout << "PID: " << pid << endl;
@@ -42,11 +41,13 @@ int main()
 
             cout << endl;
         }
+        */
+
     }
 
 
     DWORD dwProcessId, dwSessionId;
-    dwProcessId = 1000;
+    dwProcessId = 28712;    //the one we are interested in, which is found from netstat result.
 
     if (ProcessIdToSessionId(dwProcessId,  &dwSessionId) == 0) {
         cout << "ProcessIdToSessionId failed with error = "  << GetLastError();
@@ -100,7 +101,6 @@ int main()
     {
         printf("The system store was opened successfully.\n");
         PCCERT_CONTEXT  pDesiredCert = NULL;
-        LPCSTR lpszCertSubject = (LPCSTR)"nanoart";
 
         if (pDesiredCert = CertFindCertificateInStore(
             hSysStore,
@@ -109,7 +109,7 @@ int main()
             CERT_FIND_SUBJECT_STR,      // Find a certificate with a
                                         // subject that matches the string
                                         // in the next parameter.
-            lpszCertSubject,           // The Unicode string to be found
+            L"nanoart",           // The Unicode string to be found
                                         // in a certificate's subject.
             NULL))                      // NULL for the first call to the
                                         // function. In all subsequent
