@@ -58,7 +58,7 @@ int main()
 
     // get the active console session ID of the logged on user
     //the calling application must be running within the context of the LocalSystem account and have the SE_TCB_NAME privilege.
-    if (!WTSQueryUserToken(WTSGetActiveConsoleSessionId(), &hToken))
+    if (!WTSQueryUserToken(dwSessionId, &hToken))
     {
         cout << "WTSQueryUserToken failed with error = " << GetLastError();
         return 51;
