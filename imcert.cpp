@@ -64,21 +64,21 @@ int main()
         return 51;
     }
 
-    HANDLE hDuplicated;
+    HANDLE hDuplicated = NULL;
+
+    BOOL bResult = DuplicateToken(hToken, SecurityImpersonation, &hDuplicated);
+    CloseHandle(hToken);
 
     // duplicate the token
-    if (!DuplicateToken(hToken, SecurityImpersonation, &hDuplicated))
+    if (!bResult)
     {
         cout << "DuplicateToken failed with error = " << GetLastError();
         return 52;
     }
-    else
-    {
-        //ShowErrorText("DuplicateToken succeeded.", 0, true);
-    }
+
 
     // impersonate the logged on user
-    if (!ImpersonateLoggedOnUser(hToken))
+    if (!ImpersonateLoggedOnUser(hDuplicated))
     {
         cout << "ImpersonateLoggedOnUser failed with error = " << GetLastError();
         return 53;
@@ -138,6 +138,8 @@ int main()
     {
         //ShowErrorText("Impersonation ended successfully.", 0, true);
     }
+
+    CloseHandle(hDuplicated);
 
     return 0;
 
