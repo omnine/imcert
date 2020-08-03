@@ -99,7 +99,7 @@ int main()
                                          // string
     ))
     {
-        printf("The system store was opened successfully.\n");
+        printf("The current user store was opened successfully.\n");
         PCCERT_CONTEXT  pDesiredCert = NULL;
 
         if (pDesiredCert = CertFindCertificateInStore(
